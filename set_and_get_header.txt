@@ -1,0 +1,53 @@
+http://trac.pjsip.org/repos/wiki/FAQ#custom-header
+C# visual studio
+
+pjsua_msg_data msg_data;
+pjsip_generic_string_hdr my_hdr;
+pj_str_t hname = pj_str("machineType");
+pj_str_t hvalue = pj_str("doorMachine");
+
+pjsua_msg_data_init(&msg_data);
+pjsip_generic_string_hdr_init2(&my_hdr, &hname, &hvalue);
+pj_list_push_back(&msg_data.hdr_list, &my_hdr);
+
+pj_str_t uri = pj_str("sip:101@"SIP_DOMAIN);
+status = pjsua_call_make_call(acc_id, &uri, 0, NULL, &msg_data, NULL);
+
+
+
+get header
+android studio
+
+Index: pjsip/include/pjsua2/siptypes.hpp
+===================================================================
+--- pjsip/include/pjsua2/siptypes.hpp	(revision 5233)
++++ pjsip/include/pjsua2/siptypes.hpp	(working copy)
+@@ -434,6 +434,11 @@
+     SocketAddress       srcAddress;
+ 
+     /**
++     * Revial machine type
++     */
++    string 		machineType;
++
++    /**
+      * Pointer to original pjsip_rx_data. Only valid when the struct
+      * is constructed from PJSIP's pjsip_rx_data.
+      */
+Index: pjsip/src/pjsua2/siptypes.cpp
+===================================================================
+--- pjsip/src/pjsua2/siptypes.cpp	(revision 5233)
++++ pjsip/src/pjsua2/siptypes.cpp	(working copy)
+@@ -340,6 +340,13 @@
+     pj_sockaddr_print(&rdata.pkt_info.src_addr, straddr, sizeof(straddr), 3);
+     srcAddress  = straddr;
+     pjRxData    = (void *)&rdata;
++    {
++	pj_str_t  str  = pj_str("machineType");
++	pjsip_generic_string_hdr *h = (pjsip_generic_string_hdr*)pjsip_msg_find_hdr_by_name(rdata.msg_info.msg, &str, NULL);
++	if (h != NULL){
++	    machineType = string(h->hvalue.ptr, h->hvalue.slen);
++	}
++    }
+ }
+
